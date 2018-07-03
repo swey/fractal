@@ -397,8 +397,16 @@ module.exports = class ComponentSource extends EntitySource {
                 views: files.filter(f => source.isView(f)),
                 varViews: files.filter(f => source.isVarView(f)),
                 configs: files.filter(f => source.isConfig(f)),
-                resources: files.filter(f => source.isResource(f)),
+                resources: [] // Custom: Ignore the resources in the main dir
             };
+
+            // Find the "resources" dirt and use the children as resources
+            directories.forEach(dir => {
+                if (dir.name === 'resources') {
+                    const children = dir.children || [];
+                    matched.resources = children.filter(f => f.isFile && source.isResource(f))
+                }
+            });
 
             function matchFile(check) {
                 check = check.bind(source);
